@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Block Blast: AI Architect</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="app">
+    <!-- AI Controls -->
+    <div id="ai-controls">
+        <div class="ai-top-row">
+            <button id="btn-toggle-ai" class="ai-btn">Toggle AI Architect</button>
+            <button id="ai-settings-toggle">⚙️ Settings</button>
+        </div>
+        <div id="ai-settings" class="ai-settings" style="display: none;">
+            <div class="ai-settings-row">
+                <label style="cursor: pointer;"><input type="checkbox" id="chk-thinking" checked> Show Neural Search</label>
+            </div>
+            <div class="ai-settings-row">
+                <span>Speed:</span>
+                <input type="range" id="ai-speed" min="1" max="100" value="85">
+            </div>
+            <div class="ai-settings-row">
+                <label style="cursor: pointer;"><input type="checkbox" id="chk-fast-anim"> ⚡ Fast Animations</label>
+            </div>
+            <div class="ai-settings-row" id="fast-speed-row" style="display: none;">
+                <span>Fast Speed:</span>
+                <input type="range" id="ai-fast-speed" min="1" max="100" value="50">
+            </div>
+        </div>
+    </div>
+
+    <!-- UI -->
+    <div class="header">
+        <div class="score-box">
+            <span>Score</span>
+            <strong id="score">0</strong>
+        </div>
+        <div class="score-box">
+            <span>Best</span>
+            <strong id="best-score">0</strong>
+        </div>
+    </div>
+
+    <div id="board-container">
+        <div id="board"></div>
+    </div>
+
+    <div id="tray"></div>
+</div>
+
+<!-- Advanced AI Settings Panel -->
+<div id="advanced-settings-panel">
+    <button class="close-settings-btn" id="close-settings">✕</button>
+    <h2>🤖 AI Parameters</h2>
+    
+    <div class="settings-section">
+        <h3>🔍 Search Performance</h3>
+        
+        <div class="setting-row">
+            <div class="setting-label">
+                <span>Placements to Test</span>
+                <span class="setting-value" id="val-max-spots">8</span>
+            </div>
+            <input type="range" class="setting-slider" id="ai-max-spots" min="1" max="20" value="8">
+            <div class="setting-desc">Nombre de meilleures positions testées par pièce. Plus élevé = meilleure mais plus lent.</div>
+        </div>
+        
+        <div class="setting-row">
+            <div class="setting-label">
+                <span>Animation Speed</span>
+                <span class="setting-value" id="val-speed">85</span>
+            </div>
+            <input type="range" class="setting-slider" id="ai-speed-panel" min="1" max="100" value="85">
+            <div class="setting-desc">Vitesse des animations de l'IA. 100 = instantané, 1 = très lent.</div>
+        </div>
+        
+        <div class="setting-row">
+            <div class="setting-label">
+                <span>Fast Animations</span>
+                <span class="setting-value" id="val-fast-anim">OFF</span>
+            </div>
+            <label style="cursor: pointer; font-size: 13px; color: #cbd5e1;">
+                <input type="checkbox" id="chk-fast-anim-panel"> Activer les animations rapides
+            </label>
+            <div class="setting-desc">Animations simplifiées sans explosions pour une exécution plus fluide.</div>
+        </div>
+        
+        <div class="setting-row" id="fast-speed-row-panel" style="display: none;">
+            <div class="setting-label">
+                <span>Fast Animation Speed</span>
+                <span class="setting-value" id="val-fast-speed">50</span>
+            </div>
+            <input type="range" class="setting-slider" id="ai-fast-speed-panel" min="1" max="100" value="50">
+            <div class="setting-desc">Vitesse en mode rapide. 100 = instantané, 1 = lent.</div>
+        </div>
+        
+        <div class="setting-row">
+            <div class="setting-label">
+                <span>Show Thinking</span>
+                <span class="setting-value" id="val-thinking">ON</span>
+            </div>
+            <label style="cursor: pointer; font-size: 13px; color: #cbd5e1;">
+                <input type="checkbox" id="chk-thinking-panel" checked> Visualiser la recherche
+            </label>
+            <div class="setting-desc">Affiche les positions testées en rouge lors de la recherche.</div>
+        </div>
+    </div>
+    
+    <div class="settings-section">
+        <h3>⚖️ Strategy Balance</h3>
+        
+        <div class="setting-row">
+            <div class="setting-label">
+                <span>Lines Priority</span>
+                <span class="setting-value" id="val-lines-priority">1.0</span>
+            </div>
+            <input type="range" class="setting-slider" id="ai-lines-priority" min="0" max="200" value="100">
+            <div class="setting-desc">Importance de compléter des lignes vs construire stratégiquement. 0 = construction, 200 = lignes.</div>
+        </div>
+        
+        <div class="setting-row">
+            <div class="setting-label">
+                <span>Aggressiveness</span>
+                <span class="setting-value" id="val-aggressiveness">1.0</span>
+            </div>
+            <input type="range" class="setting-slider" id="ai-aggressiveness" min="0" max="200" value="100">
+            <div class="setting-desc">Tendance à chercher des combos et grandes lignes plutôt que placements sûrs.</div>
+        </div>
+    </div>
+    
+    <div class="settings-section">
+        <h3>📊 Board Evaluation</h3>
+        
+        <div class="setting-row">
+            <div class="setting-label">
+                <span>Energy Factor</span>
+                <span class="setting-value" id="val-energy">1.5</span>
+            </div>
+            <input type="range" class="setting-slider" id="ai-energy" min="50" max="300" value="150">
+            <div class="setting-desc">Poids de la densité des lignes/colonnes. Plus élevé = favorise lignes pleines.</div>
+        </div>
+        
+        <div class="setting-row">
+            <div class="setting-label">
+                <span>Edge Penalty</span>
+                <span class="setting-value" id="val-edge">5.0</span>
+            </div>
+            <input type="range" class="setting-slider" id="ai-edge" min="0" max="200" value="50">
+            <div class="setting-desc">Pénalité pour les bords internes (espaces entre blocs). Favorise les blocs compacts.</div>
+        </div>
+        
+        <div class="setting-row">
+            <div class="setting-label">
+                <span>Space Bonus</span>
+                <span class="setting-value" id="val-space">50</span>
+            </div>
+            <input type="range" class="setting-slider" id="ai-space" min="0" max="200" value="50">
+            <div class="setting-desc">Bonus pour les espaces 3x3 vides. Favorise les placements qui créent de l'espace.</div>
+        </div>
+        
+        <div class="setting-row">
+            <div class="setting-label">
+                <span>No Space Penalty</span>
+                <span class="setting-value" id="val-no-space">8000</span>
+            </div>
+            <input type="range" class="setting-slider" id="ai-no-space" min="0" max="20000" value="8000" step="500">
+            <div class="setting-desc">Pénalité massive quand aucun espace 3x3 disponible. Force l'IA à préserver de l'espace.</div>
+        </div>
+    </div>
+    
+    <div class="settings-section">
+        <h3>🎯 Combo System</h3>
+        
+        <div class="setting-row">
+            <div class="setting-label">
+                <span>Combo Exponent</span>
+                <span class="setting-value" id="val-combo-exp">2.8</span>
+            </div>
+            <input type="range" class="setting-slider" id="ai-combo-exp" min="10" max="50" value="28">
+            <div class="setting-desc">Exponent de récompense pour combos. Plus élevé = plus valorise les grands combos.</div>
+        </div>
+        
+        <div class="setting-row">
+            <div class="setting-label">
+                <span>Combo Multiplier</span>
+                <span class="setting-value" id="val-combo-mult">60</span>
+            </div>
+            <input type="range" class="setting-slider" id="ai-combo-mult" min="10" max="200" value="60">
+            <div class="setting-desc">Multiplicateur de base pour les combos. Ajuste l'importance globale des combos.</div>
+        </div>
+    </div>
+    
+    <button class="reset-btn" id="reset-settings">↺ Reset to Defaults</button>
+</div>
+
+<div id="game-over">
+    <h1>Game Over</h1>
+    <p>Final Score: <strong id="final-score" style="color:#38bdf8;">0</strong></p>
+    <button id="btn-play-again">Play Again</button>
+</div>
+
+<script src="game-core.js"></script>
+<script src="ai-params.js"></script>
+<script src="ai-engine.js"></script>
+<script src="ui-manager.js"></script>
+</body>
+</html>

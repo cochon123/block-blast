@@ -4,7 +4,7 @@ Block Blast with automatic solver.
 
 ## Demo
 
-https://github.com/user-attachments/assets/demo.mp4
+https://github.com/cochon123/block-blast/raw/main/demo.mp4
 
 ## Run
 
